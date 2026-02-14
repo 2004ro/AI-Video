@@ -43,7 +43,27 @@ if __name__ == "__main__":
         
         # 3. Visuals
         print("3. Fetching Visuals...")
-        fetch_images(topic, count=8) # Fetch 8 images for variety
+        images = fetch_images(topic, count=8) # Fetch 8 images for variety
+        
+        # --- IMPROVEMENT: FALLBACK MECHANISM ---
+        if not images or len(images) == 0:
+            print("   ⚠️ Pexels API failed or found no images. Using fallback generator...")
+            from PIL import Image
+            if not os.path.exists("assets"): os.makedirs("assets")
+            
+            # Generate 3 fallback solid-color images
+            colors = [(40, 44, 52), (100, 149, 237), (255, 127, 80)] # Dark, Blue, Coral
+            images = []
+            for i, color in enumerate(colors):
+                fallback_path = f"assets/image_{i}.jpg"
+                img = Image.new('RGB', (1080, 1920), color=color)
+                img.save(fallback_path)
+                # Save first one as image.jpg for thumbnail fallback too
+                if i == 0:
+                    img.save("image.jpg")
+                images.append(fallback_path)
+            print(f"   Success: Generated {len(images)} fallback visual(s).")
+        # ---------------------------------------
         
         # 4. Thumbnail
         print("4. Generating Thumbnail...")
